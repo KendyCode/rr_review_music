@@ -1,0 +1,18 @@
+# Environnement virtuel
+.venv/
+venv/
+env/
+
+# Secrets
+.env
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# IDE (PyCharm)
+.idea/
+
+# Fichiers de données (Exports)
+app/static/exports/*
+!app/static/exports/.gitkeep

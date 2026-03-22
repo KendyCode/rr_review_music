@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm p-4 mb-4">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="input-group">
+                    {{ form.search(class="form-control", placeholder="Artiste, album, titre...") }}
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for item in results %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="{{ item.album.cover_medium }}" class="card-img-top" alt="Cover">
+                    <div class="card-body text-center">
+                        <h6 class="card-title text-truncate">{{ item.title }}</h6>
+                        <p class="card-text small text-muted">{{ item.artist.name }}</p>
+                        <a href="{{ url_for('add_review', deezer_id=item.id) }}" class="btn btn-sm btn-outline-success">Noter ce titre</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

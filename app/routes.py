@@ -73,6 +73,7 @@ def search():
         query = form.search.data
         # Appel à l'API Deezer
         response = requests.get(f"https://api.deezer.com/search?q={query}")
+        print(response.json())
         if response.status_code == 200:
             results = response.json().get('data', [])
     return render_template('search.html', form=form, results=results)
@@ -157,3 +158,23 @@ def delete_review(review_id):
     db.session.commit()
     flash("L'avis a été supprimé.", "info")
     return redirect(url_for('my_reviews'))
+
+@app.route('/track/<int:deezer_id>')
+def track_details(deezer_id):
+    # 1. Récupérer les infos fraîches de Deezer (pour l'extrait audio)
+    response = requests.get(f"https://api.deezer.com/track/{deezer_id}")
+    track_data = response.json() if response.status_code == 200 else None
+
+    if not track_data:
+        flash("Musique introuvable.", "danger")
+        return redirect(url_for('search'))
+
+    # 2. Chercher la musique dans notre BDD pour avoir les avis
+    track_in_db = Track.query.filter_by(deezer_id=str(deezer_id)).first()
+
+    reviews = []
+    if track_in_db:
+        # On récupère tous les avis liés à ce titre
+        reviews = Review.query.filter_by(track_id=track_in_db.id).order_by(Review.date_posted.desc()).all()
+
+    return render_template('track_details.html', track=track_data, reviews=reviews)

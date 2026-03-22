@@ -31,7 +31,9 @@
                 <div class="card h-100 border-0 shadow-sm">
                     <div class="row g-0">
                         <div class="col-4">
+                            <a href="{{ url_for('track_details', deezer_id=review.track.deezer_id) }}">
                             <img src="{{ review.track.cover_medium }}" class="img-fluid rounded-start h-100 object-fit-cover" alt="cover">
+                            </a>
                         </div>
                         <div class="col-8">
                             <div class="card-body py-2">

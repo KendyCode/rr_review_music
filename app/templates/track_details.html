@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4 text-center">
+        <img src="{{ track.album.cover_big }}" class="img-fluid rounded shadow mb-3" alt="cover">
+        <h3>{{ track.title }}</h3>
+        <p class="lead">{{ track.artist.name }}</p>
+
+        <div class="card bg-light p-3 mb-3">
+            <h6>Extrait sonore 🎧</h6>
+            <audio controls class="w-100">
+                <source src="{{ track.preview }}" type="audio/mpeg">
+                Votre navigateur ne supporte pas la lecture audio.
+            </audio>
+        </div>
+
+        <a href="{{ url_for('add_review', deezer_id=track.id) }}" class="btn btn-success w-100 mb-2">
+            Noter ce titre
+        </a>
+        <a href="{{ url_for('search') }}" class="btn btn-outline-secondary w-100">Retour à la recherche</a>
+    </div>
+
+    <div class="col-md-8">
+        <h4>Avis de la communauté ({{ reviews|length }})</h4>
+        <hr>
+
+        {% if not reviews %}
+        <p class="text-muted">Aucun avis pour le moment. Soyez le premier à donner le vôtre !</p>
+        {% else %}
+        {% for review in reviews %}
+        <div class="card mb-3 {% if current_user.is_authenticated and review.author.id == current_user.id %}border-primary{% endif %}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        Par <strong>{{ review.author.username }}</strong>
+                        {% if current_user.is_authenticated and review.author.id == current_user.id %}
+                        <span class="badge bg-primary">Mon avis</span>
+                        {% endif %}
+                    </h6>
+                    <span class="badge bg-warning text-dark">{{ review.rating }}/5 ⭐</span>
+                </div>
+                <p class="card-text">"{{ review.content }}"</p>
+                <small class="text-muted">{{ review.date_posted.strftime('%d/%m/%Y') }}</small>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

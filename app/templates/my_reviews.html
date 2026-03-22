@@ -10,7 +10,9 @@
         <div class="list-group shadow-sm">
             {% for review in reviews %}
             <div class="list-group-item list-group-item-action d-flex gap-3 py-3">
+                <a href="{{ url_for('track_details', deezer_id=review.track.deezer_id) }}" class="flex-shrink-0">
                 <img src="{{ review.track.cover_medium }}" alt="cover" width="80" height="80" class="rounded flex-shrink-0">
+                </a>
                 <div class="d-flex flex-column w-100">
                     <div class="d-flex justify-content-between">
                         <div>

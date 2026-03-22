@@ -7,6 +7,12 @@ from flask_login import current_user, login_required, login_user, logout_user
 from flask import current_app as app
 from .forms import LoginForm, RegistrationForm # Assure-toi d'avoir créé ce formulaire dans forms.py
 
+@app.route('/')
+def index():
+    # Optionnel : Afficher les 5 derniers avis publics sur le site
+    latest_reviews = Review.query.order_by(Review.date_posted.desc()).limit(5).all()
+    return render_template('index.html', reviews=latest_reviews)
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -110,3 +116,44 @@ def add_review(deezer_id):
         return redirect(url_for('search')) # Ou vers la page de profil
 
     return render_template('add_review.html', form=form, track=track)
+
+@app.route('/review/edit/<int:review_id>', methods=['GET', 'POST'])
+@login_required
+def edit_review(review_id):
+    review = Review.query.get_or_404(review_id)
+
+    # SÉCURITÉ : Vérifier que l'auteur est bien l'utilisateur connecté
+    if review.author != current_user:
+        flash("Vous n'avez pas l'autorisation de modifier cet avis.", "danger")
+        return redirect(url_for('my_reviews'))
+
+    form = ReviewForm()
+
+    if form.validate_on_submit():
+        review.content = form.content.data
+        review.rating = form.rating.data
+        db.session.commit()
+        flash("Votre avis a été mis à jour !", "success")
+        return redirect(url_for('my_reviews'))
+
+    # Pré-remplir le formulaire avec les données actuelles
+    elif request.method == 'GET':
+        form.content.data = review.content
+        form.rating.data = review.rating
+
+    return render_template('edit_review.html', form=form, track=review.track)
+
+@app.route('/review/delete/<int:review_id>', methods=['POST'])
+@login_required
+def delete_review(review_id):
+    review = Review.query.get_or_404(review_id)
+
+    # SÉCURITÉ : Vérifier que l'auteur est bien l'utilisateur connecté
+    if review.author != current_user:
+        flash("Action non autorisée.", "danger")
+        return redirect(url_for('my_reviews'))
+
+    db.session.delete(review)
+    db.session.commit()
+    flash("L'avis a été supprimé.", "info")
+    return redirect(url_for('my_reviews'))

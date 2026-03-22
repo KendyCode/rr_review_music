@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-dark text-white rounded-3 shadow">
+    <div class="container-fluid py-5 text-center">
+        <h1 class="display-5 fw-bold">Bienvenue sur MusicLog 🎵</h1>
+        <p class="col-md-12 fs-4 text-secondary">
+            Découvrez de nouvelles musiques via l'API Deezer, notez vos morceaux préférés et partagez vos avis avec la communauté.
+        </p>
+        {% if not current_user.is_authenticated %}
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4 gap-3">Créer un compte</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg px-4">Se connecter</a>
+        </div>
+        {% else %}
+        <a href="{{ url_for('search') }}" class="btn btn-success btn-lg px-4 mt-4">Rechercher une musique</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 class="mb-4">Dernières pépites notées ✨</h3>
+        <hr>
+        {% if not reviews %}
+        <p class="text-muted text-center">Aucun avis pour le moment. Soyez le premier à en poster un !</p>
+        {% else %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for review in reviews %}
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-4">
+                            <img src="{{ review.track.cover_medium }}" class="img-fluid rounded-start h-100 object-fit-cover" alt="cover">
+                        </div>
+                        <div class="col-8">
+                            <div class="card-body py-2">
+                                <h6 class="card-title text-truncate mb-0">{{ review.track.title }}</h6>
+                                <small class="text-muted">{{ review.track.artist }}</small>
+                                <div class="mt-1">
+                                    <span class="badge bg-warning text-dark">{{ review.rating }}/5 ⭐</span>
+                                </div>
+                                <p class="card-text small mt-2 text-truncate">"{{ review.content }}"</p>
+                                <footer class="blockquote-footer mt-1" style="font-size: 0.75rem;">
+                                    Par <strong>{{ review.author.username }}</strong>
+                                </footer>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

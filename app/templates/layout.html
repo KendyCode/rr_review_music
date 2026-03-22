@@ -6,11 +6,19 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-<nav class="navbar navbar-dark bg-dark mb-4">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
     <div class="container">
         <a class="navbar-brand" href="/">🎵 MusicLog</a>
-        <div>
-            <a class="btn btn-outline-light btn-sm" href="{{ url_for('search') }}">Rechercher</a>
+        <div class="navbar-nav ms-auto">
+            {% if current_user.is_authenticated %}
+            <span class="navbar-text me-3 text-white">Bonjour, {{ current_user.username }}</span>
+            <a class="nav-link" href="{{ url_for('search') }}">Rechercher</a>
+            <a class="nav-link" href="{{ url_for('my_reviews') }}">Mes Avis</a>
+            <a class="nav-link btn btn-outline-danger btn-sm ms-2" href="{{ url_for('logout') }}">Déconnexion</a>
+            {% else %}
+            <a class="nav-link" href="{{ url_for('login') }}">Connexion</a>
+            <a class="nav-link" href="{{ url_for('register') }}">S'inscrire</a>
+            {% endif %}
         </div>
     </div>
 </nav>

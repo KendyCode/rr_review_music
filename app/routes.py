@@ -52,6 +52,13 @@ def logout():
     logout_user()
     return redirect(url_for('search'))
 
+@app.route('/my-reviews')
+@login_required
+def my_reviews():
+    # current_user.reviews fonctionne grâce au backref='author' dans le modèle User
+    user_reviews = current_user.reviews
+    return render_template('my_reviews.html', reviews=user_reviews)
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     form = SearchForm()

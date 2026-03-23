@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4 text-danger">Console d'Administration</h1>
+
+    <div class="row">
+        <div class="col-md-12 mb-5">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white d-flex justify-content-between">
+                    <h5 class="mb-0">Gestion des Tracks (Base de données)</h5>
+                    <a href="{{ url_for('admin_add_track') }}" class="btn btn-sm btn-success">Ajouter manuellement</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>Cover</th>
+                            <th>Titre / Artiste</th>
+                            <th>Deezer ID</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for track in tracks %}
+                        <tr>
+                            <td><img src="{{ track.cover_medium }}" width="40" class="rounded"></td>
+                            <td><strong>{{ track.title }}</strong><br><small>{{ track.artist }}</small></td>
+                            <td><code>{{ track.deezer_id }}</code></td>
+                            <td>
+                                <a href="{{ url_for('admin_edit_track', track_id=track.id) }}" class="btn btn-sm btn-info">Éditer</a>
+
+                                <form action="{{ url_for('admin_delete_track', track_id=track.id) }}" method="POST" style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer ce titre et TOUS ses avis ?')">Supprimer</button>
+
+                                </form>
+
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Modération des Avis Utilisateurs</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>Utilisateur</th>
+                            <th>Track</th>
+                            <th>Note</th>
+                            <th>Commentaire</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for review in reviews %}
+                        <tr>
+                            <td>{{ review.author.username }}</td>
+                            <td>{{ review.track.title }}</td>
+                            <td><span class="badge bg-warning text-dark">{{ review.rating }}/5</span></td>
+                            <td class="small">{{ review.content|truncate(50) }}</td>
+                            <td>
+                                <a href="{{ url_for('edit_review', review_id=review.id) }}" class="btn btn-sm btn-info">Éditer</a>
+                                <form action="{{ url_for('delete_review', review_id=review.id) }}" method="POST" style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-sm btn-danger">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

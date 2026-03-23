@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0">{{ 'Modifier' if track else 'Ajouter' }} une Track</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3 text-center">
+                        {% if track %}
+                        <img src="{{ track.cover_medium }}" class="rounded shadow-sm mb-2" width="120">
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Titre de la chanson</label>
+                        <input type="text" name="title" class="form-control" value="{{ track.title if track else '' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Artiste</label>
+                        <input type="text" name="artist" class="form-control" value="{{ track.artist if track else '' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Deezer ID (Numérique)</label>
+                        <input type="text" name="deezer_id" class="form-control" value="{{ track.deezer_id if track else '' }}" required>
+                        <small class="text-muted">Indispensable pour le lecteur audio.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">URL de la pochette (Cover)</label>
+                        <input type="url" name="cover_url" class="form-control" value="{{ track.cover_medium if track else '' }}" placeholder="https://...">
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Annuler</a>
+                        <button type="submit" class="btn btn-primary px-4">Enregistrer les modifications</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

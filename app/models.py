@@ -32,7 +32,8 @@ class Track(db.Model):
     cover_medium = db.Column(db.String(300)) # URL de l'image de l'album
 
     # Relation : Un morceau peut avoir plusieurs avis
-    reviews = db.relationship('Review', backref='track', lazy=True)
+    # cascade="all, delete-orphan" pour supprimer les avis si la musique est supprimée
+    reviews = db.relationship('Review', backref='track', lazy=True, cascade="all, delete-orphan")
 
 class Review(db.Model):
     __tablename__ = 'reviews'

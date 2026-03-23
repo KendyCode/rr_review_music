@@ -229,21 +229,31 @@ def delete_review(review_id):
 
 @app.route('/track/<int:deezer_id>')
 def track_details(deezer_id):
-    # 1. Récupérer les infos fraîches de Deezer (pour l'extrait audio)
+    # 1. On récupère les infos Deezer (pour l'audio preview qui n'est pas en BDD)
     response = requests.get(f"https://api.deezer.com/track/{deezer_id}")
-    print(response.json())
-    track_data = response.json() if response.status_code == 200 else None
+    track_api = response.json() if response.status_code == 200 else None
 
-    if not track_data:
-        flash("Musique introuvable.", "danger")
-        return redirect(url_for('search'))
+    print(track_api.get("album").get("cover_big"))
 
-    # 2. Chercher la musique dans notre BDD pour avoir les avis
+    # 2. On cherche dans notre BDD
     track_in_db = Track.query.filter_by(deezer_id=str(deezer_id)).first()
 
+
     reviews = []
+    display_track = track_api # Par défaut, on utilise l'API
+
     if track_in_db:
-        # On récupère tous les avis liés à ce titre
+        # On récupère les avis
         reviews = Review.query.filter_by(track_id=track_in_db.id).order_by(Review.date_posted.desc()).all()
 
-    return render_template('track_details.html', track=track_data, reviews=reviews)
+        # SÉCURITÉ : On remplace les infos de l'API par celles de notre BDD
+        # On garde track_api pour le preview sonore car il n'est pas en BDD
+        display_track = {
+            'title': track_in_db.title,
+            'artist': {'name': track_in_db.artist},
+            'album': {'cover_big': track_api.get("album").get("cover_big") if track_api else track_in_db.cover_medium},
+            'preview': track_api.get('preview') if track_api else None,
+            'id': track_in_db.deezer_id
+        }
+
+    return render_template('track_details.html', track=display_track, reviews=reviews)

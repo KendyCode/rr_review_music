@@ -12,6 +12,8 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
 
+    is_admin = db.Column(db.Boolean, default=False)
+
     # Relation : Un utilisateur peut écrire plusieurs avis
     reviews = db.relationship('Review', backref='author', lazy=True)
 

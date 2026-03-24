@@ -8,6 +8,12 @@ from flask import current_app as app
 from .forms import LoginForm, RegistrationForm # Assure-toi d'avoir créé ce formulaire dans forms.py
 from functools import wraps
 from flask import abort
+import os
+
+if os.getenv("USE_PROXY") == "True":
+    proxies = {"http": "http://172.16.0.51:8080", "https": "http://172.16.0.51:8080"}
+else:
+    proxies = None
 
 def admin_required(f):
     @wraps(f)
@@ -140,7 +146,7 @@ def search():
     if form.validate_on_submit():
         query = form.search.data
         # Appel à l'API Deezer
-        response = requests.get(f"https://api.deezer.com/search?q={query}")
+        response = requests.get(f"https://api.deezer.com/search?q={query}",proxies=proxies, timeout=5)
         print(response.json())
         if response.status_code == 200:
             results = response.json().get('data', [])
@@ -156,7 +162,7 @@ def add_review(deezer_id):
 
     # 2. Si elle n'existe pas, on va chercher ses infos sur l'API Deezer
     if not track:
-        response = requests.get(f"https://api.deezer.com/track/{deezer_id}")
+        response = requests.get(f"https://api.deezer.com/track/{deezer_id}",proxies=proxies, timeout=5)
         if response.status_code == 200:
             data = response.json()
             track = Track(
@@ -230,7 +236,7 @@ def delete_review(review_id):
 @app.route('/track/<int:deezer_id>')
 def track_details(deezer_id):
     # 1. On récupère les infos Deezer (pour l'audio preview qui n'est pas en BDD)
-    response = requests.get(f"https://api.deezer.com/track/{deezer_id}")
+    response = requests.get(f"https://api.deezer.com/track/{deezer_id}",proxies=proxies, timeout=5)
     track_api = response.json() if response.status_code == 200 else None
 
     print(track_api.get("album").get("cover_big"))
